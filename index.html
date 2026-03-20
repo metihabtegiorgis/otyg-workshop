@@ -4,560 +4,897 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Workshop Navigator</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root {
-    --gold: #C9A84C;
-    --gold-light: #E8C97A;
-    --deep: #1A1209;
-    --cream: #FAF6EE;
-    --warm: #F5EDD8;
-    --muted: #8A7A5A;
-    --border: rgba(201,168,76,0.25);
-    --shadow: 0 8px 40px rgba(26,18,9,0.15);
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+  --deep: #1A1209;
+  --cream: #FAF6EE;
+  --warm: #F5EDD8;
+  --muted: #8A7A5A;
+  --border: rgba(201,168,76,0.25);
+  --shadow: 0 8px 40px rgba(26,18,9,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--cream); min-height:100vh; }
 
-    --c1: #2C5F8A; /* Group 1 - blue */
-    --c2: #5A8A2C; /* Group 2 - green */
-    --c3: #8A2C5A; /* Group 3 - rose */
-    --c4: #8A5A2C; /* Group 4 - amber */
-    --c5: #5A2C8A; /* Group 5 - violet */
-    --c6: #2C8A7A; /* Group 6 - teal */
-  }
+/* ── ADMIN ── */
+#admin-view { padding:40px 24px; max-width:1200px; margin:0 auto; }
+.admin-header { text-align:center; margin-bottom:48px; }
+.admin-header h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,3rem); color:var(--gold); }
+.admin-header p { color:var(--muted); font-size:.9rem; margin-top:10px; }
+.divider { width:80px; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:16px auto; }
+.qr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; }
+.qr-card { background:var(--warm); border-radius:18px; overflow:hidden; color:var(--deep); box-shadow:var(--shadow); }
+.qr-card-header { padding:18px 22px 14px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(0,0,0,.08); }
+.group-badge { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:900; flex-shrink:0; }
+.qr-card-header h2 { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--deep); }
+.qr-card-header small { font-size:.72rem; color:var(--muted); display:block; margin-top:2px; }
+.qr-area { padding:20px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+.qr-box { background:white; padding:10px; border-radius:10px; }
+.qr-url { font-size:.65rem; color:var(--muted); word-break:break-all; text-align:center; }
+.print-btn { margin:40px auto 0; display:block; background:var(--gold); color:var(--deep); border:none; padding:13px 34px; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:600; cursor:pointer; }
+.print-btn:hover { background:var(--gold-light); }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ── PARTICIPANT ── */
+#participant-view { display:none; min-height:100vh; }
+.p-hero { padding:52px 24px 36px; text-align:center; position:relative; overflow:hidden; }
+.p-hero-bg { position:absolute; inset:0; opacity:.07; background-image:radial-gradient(circle,white 1px,transparent 1px); background-size:32px 32px; }
+.p-hero .big-num { font-family:'Playfair Display',serif; font-size:4.5rem; font-weight:900; color:white; line-height:1; position:relative; }
+.p-hero h2 { font-family:'Playfair Display',serif; font-size:1.35rem; color:rgba(255,255,255,.85); position:relative; margin-top:4px; }
+.p-hero p { color:rgba(255,255,255,.55); font-size:.85rem; position:relative; margin-top:6px; }
+.p-body { background:var(--cream); border-radius:24px 24px 0 0; margin-top:-16px; padding:32px 20px 60px; min-height:65vh; color:var(--deep); }
+.p-body-label { text-align:center; text-transform:uppercase; letter-spacing:.08em; font-size:.7rem; color:var(--muted); font-weight:600; margin-bottom:18px; }
+.mini-btn-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:0 auto; }
+.mini-btn { display:flex; align-items:center; gap:14px; padding:16px 18px; border-radius:14px; border:2px solid; background:white; box-shadow:0 3px 14px rgba(0,0,0,.06); cursor:pointer; width:100%; text-align:left; font-family:'DM Sans',sans-serif; transition:transform .15s,box-shadow .15s; }
+.mini-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.1); }
+.mini-btn-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:900; color:white; flex-shrink:0; }
+.mini-btn strong { display:block; font-size:.98rem; font-weight:600; color:var(--deep); }
+.mini-btn span { font-size:.75rem; color:var(--muted); }
+.mini-btn-arrow { margin-left:auto; color:var(--muted); font-size:1.1rem; }
+.p-footer { text-align:center; margin-top:32px; font-size:.75rem; color:var(--muted); padding-top:20px; border-top:1px solid rgba(0,0,0,.07); }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--deep);
-    color: var(--cream);
-    min-height: 100vh;
-  }
+/* ── CONTENT VIEW ── */
+#content-view { display:none; min-height:100vh; background:var(--cream); }
+.c-hero { padding:40px 20px 28px; text-align:center; position:relative; overflow:hidden; }
+.c-hero-bg { position:absolute; inset:0; opacity:.07; background-image:radial-gradient(circle,white 1px,transparent 1px); background-size:32px 32px; }
+.c-hero .c-tag { display:inline-block; background:rgba(255,255,255,.2); color:white; border-radius:50px; padding:4px 14px; font-size:.72rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px; position:relative; }
+.c-hero h1 { font-family:'Playfair Display',serif; font-size:1.6rem; color:white; position:relative; font-weight:900; }
+.c-back { display:inline-flex; align-items:center; gap:6px; margin-top:12px; color:rgba(255,255,255,.7); font-size:.8rem; cursor:pointer; background:none; border:none; font-family:'DM Sans',sans-serif; position:relative; }
+.c-back:hover { color:white; }
+.c-content { max-width:680px; margin:0 auto; padding:32px 20px 64px; }
 
-  /* ── ADMIN / PRINT VIEW ── */
-  #admin-view {
-    padding: 40px 24px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+.section-block { margin-bottom:32px; }
+.section-label { display:flex; align-items:center; gap:8px; font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; font-weight:700; color:var(--muted); margin-bottom:14px; }
+.section-label::after { content:''; flex:1; height:1px; background:rgba(0,0,0,.1); }
 
-  .admin-header {
-    text-align: center;
-    margin-bottom: 56px;
-  }
+.scripture-card { background:white; border-radius:14px; padding:20px 22px; margin-bottom:10px; border-left:4px solid; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+.scripture-ref { font-size:.78rem; font-weight:700; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:.04em; }
+.scripture-text { font-family:'Playfair Display',serif; font-size:1rem; line-height:1.7; color:#2a1f10; font-style:italic; }
 
-  .admin-header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    color: var(--gold);
-    line-height: 1.1;
-    margin-bottom: 12px;
-  }
+.commentary-card { background:white; border-radius:14px; padding:22px 24px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+.commentary-source { font-size:.75rem; font-weight:700; color:var(--muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:.05em; }
+.commentary-text { font-size:.93rem; line-height:1.8; color:#3a2e1a; }
+.commentary-text p { margin-bottom:12px; }
+.commentary-text p:last-child { margin-bottom:0; }
 
-  .admin-header p {
-    color: var(--muted);
-    font-size: 1rem;
-    font-weight: 300;
-  }
+.takeaway-card { border-radius:14px; padding:22px 24px; text-align:center; }
+.takeaway-card p { font-family:'Playfair Display',serif; font-size:1.1rem; line-height:1.65; color:white; font-style:italic; }
 
-  .admin-header .divider {
-    width: 80px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 20px auto;
-  }
-
-  .qr-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 28px;
-  }
-
-  .qr-card {
-    background: var(--warm);
-    border-radius: 20px;
-    overflow: hidden;
-    color: var(--deep);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    transition: transform 0.2s ease;
-  }
-
-  .qr-card:hover { transform: translateY(-4px); }
-
-  .qr-card-header {
-    padding: 20px 24px 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-  }
-
-  .group-badge {
-    width: 44px; height: 44px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    color: white;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    font-weight: 900;
-    flex-shrink: 0;
-  }
-
-  .qr-card-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.25rem;
-    color: var(--deep);
-  }
-
-  .qr-card-header small {
-    font-size: 0.75rem;
-    color: var(--muted);
-    display: block;
-    margin-top: 2px;
-  }
-
-  .qr-area {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .qr-box {
-    background: white;
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-  }
-
-  .mini-links {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .mini-link-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1.5px solid;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.15s ease;
-    cursor: pointer;
-    background: transparent;
-  }
-
-  .mini-link-btn:hover { opacity: 0.8; transform: translateX(3px); }
-
-  .mini-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .print-btn {
-    margin: 48px auto 0;
-    display: block;
-    background: var(--gold);
-    color: var(--deep);
-    border: none;
-    padding: 14px 36px;
-    border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    letter-spacing: 0.02em;
-  }
-
-  .print-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
-
-  /* ── PARTICIPANT / LANDING VIEW ── */
-  #participant-view {
-    display: none;
-    min-height: 100vh;
-    padding: 0;
-  }
-
-  .participant-hero {
-    padding: 60px 24px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-bg {
-    position: absolute; inset: 0;
-    opacity: 0.06;
-    background-image: radial-gradient(circle at 30% 50%, white 1px, transparent 1px),
-                      radial-gradient(circle at 70% 20%, white 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  .participant-hero .group-number {
-    display: inline-block;
-    font-family: 'Playfair Display', serif;
-    font-size: 5rem;
-    font-weight: 900;
-    line-height: 1;
-    color: white;
-    margin-bottom: 8px;
-    position: relative;
-  }
-
-  .participant-hero h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: rgba(255,255,255,0.85);
-    font-weight: 700;
-    margin-bottom: 8px;
-    position: relative;
-  }
-
-  .participant-hero p {
-    color: rgba(255,255,255,0.6);
-    font-size: 0.9rem;
-    position: relative;
-  }
-
-  .participant-content {
-    background: var(--cream);
-    border-radius: 28px 28px 0 0;
-    margin-top: -20px;
-    padding: 36px 24px 60px;
-    min-height: 60vh;
-    color: var(--deep);
-    position: relative;
-  }
-
-  .participant-content h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    color: var(--muted);
-    margin-bottom: 20px;
-    text-align: center;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-  }
-
-  .mini-group-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  .mini-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 22px;
-    border-radius: 16px;
-    border: 2px solid;
-    text-decoration: none;
-    color: var(--deep);
-    background: white;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .mini-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 5px;
-  }
-
-  .mini-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  }
-
-  .mini-card:active { transform: scale(0.98); }
-
-  .mini-card-icon {
-    width: 48px; height: 48px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    font-weight: 900;
-    color: white;
-    flex-shrink: 0;
-  }
-
-  .mini-card-text strong {
-    display: block;
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 3px;
-  }
-
-  .mini-card-text span {
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-
-  .mini-card-arrow {
-    margin-left: auto;
-    font-size: 1.2rem;
-    color: var(--muted);
-    transition: transform 0.2s ease;
-  }
-
-  .mini-card:hover .mini-card-arrow { transform: translateX(4px); }
-
-  .participant-footer {
-    text-align: center;
-    margin-top: 40px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(0,0,0,0.08);
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-
-  /* ── PRINT STYLES ── */
-  @media print {
-    body { background: white !important; }
-    #admin-view { padding: 0; }
-    .admin-header, .print-btn { display: none; }
-    .qr-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .qr-card { break-inside: avoid; border: 2px solid #ddd; background: white !important; color: black !important; box-shadow: none; }
-    .qr-card-header h2, .qr-card-header small { color: black !important; }
-    .print-instructions { display: block !important; }
-  }
-
-  .print-instructions {
-    display: none;
-    text-align: center;
-    font-size: 0.7rem;
-    color: #888;
-    margin-top: 8px;
-  }
+/* ── PRINT ── */
+@media print {
+  body { background:white !important; }
+  #admin-view { padding:0; }
+  .admin-header, .print-btn { display:none !important; }
+  .qr-grid { grid-template-columns:repeat(2,1fr); gap:16px; }
+  .qr-card { break-inside:avoid; box-shadow:none; border:2px solid #ddd; background:white !important; }
+}
 </style>
 </head>
 <body>
 
-<!-- ══ ADMIN VIEW (default) ══ -->
 <div id="admin-view">
   <div class="admin-header">
     <h1>Workshop QR Codes</h1>
     <div class="divider"></div>
-    <p>Print each card and place at the corresponding group's table. Participants scan → tap their mini-team → open their doc.</p>
+    <p>Print and place one card at each table. Participants scan → choose their mini-team → read their content.</p>
   </div>
-
   <div class="qr-grid" id="qr-grid"></div>
-
   <button class="print-btn" onclick="window.print()">🖨 Print All QR Cards</button>
 </div>
 
-<!-- ══ PARTICIPANT VIEW (shown when ?group=N in URL) ══ -->
 <div id="participant-view">
-  <div class="participant-hero" id="participant-hero">
-    <div class="hero-bg"></div>
-    <div class="group-number" id="hero-number"></div>
-    <h2 id="hero-title"></h2>
-    <p>Tap your mini-team to open your document</p>
+  <div class="p-hero" id="p-hero">
+    <div class="p-hero-bg"></div>
+    <div class="big-num" id="p-num"></div>
+    <h2 id="p-title"></h2>
+    <p>Select your mini-team below</p>
   </div>
-  <div class="participant-content">
-    <h3>Choose your mini-team</h3>
-    <div class="mini-group-cards" id="mini-group-cards"></div>
-    <div class="participant-footer">Workshop Navigator · If you're unsure which mini-team you're in, ask your facilitator.</div>
+  <div class="p-body">
+    <div class="p-body-label">Choose your mini-team</div>
+    <div class="mini-btn-list" id="mini-btn-list"></div>
+    <div class="p-footer">If unsure which mini-team you're in, ask your facilitator.</div>
   </div>
 </div>
 
+<div id="content-view">
+  <div class="c-hero" id="c-hero">
+    <div class="c-hero-bg"></div>
+    <div class="c-tag" id="c-tag"></div>
+    <h1 id="c-title"></h1>
+    <button class="c-back" id="c-back">← Back to group</button>
+  </div>
+  <div class="c-content" id="c-content"></div>
+</div>
+
 <script>
-// ══════════════════════════════════════════════
-//  DATA — 6 groups, each with 3 mini-teams
-//  Each mini-team links to a specific Google Doc
-//  Docs have named anchor tabs via heading IDs
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════
 const GROUPS = [
-  {
-    id: 1,
-    name: "Group 1",
-    color: "#2C5F8A",
-    miniTeams: [
-      { label: "Mini-Team A", url: "https://docs.google.com/document/d/1BS35lqbZPqAB9LB08_VPB54LjgxtXVZFBw2jls6fCCI/edit#heading=h.mini1" },
-      { label: "Mini-Team B", url: "https://docs.google.com/document/d/1BS35lqbZPqAB9LB08_VPB54LjgxtXVZFBw2jls6fCCI/edit#heading=h.mini2" },
-      { label: "Mini-Team C", url: "https://docs.google.com/document/d/1BS35lqbZPqAB9LB08_VPB54LjgxtXVZFBw2jls6fCCI/edit#heading=h.mini3" },
-    ]
-  },
-  {
-    id: 2,
-    name: "Group 2",
-    color: "#4A7A35",
-    miniTeams: [
-      { label: "Mini-Team A", url: "https://docs.google.com/document/d/1b0yZtdXfGooT0eJDR3ffRU7mH25rNX0dXcloWe2ImS8/edit#heading=h.mini1" },
-      { label: "Mini-Team B", url: "https://docs.google.com/document/d/1b0yZtdXfGooT0eJDR3ffRU7mH25rNX0dXcloWe2ImS8/edit#heading=h.mini2" },
-      { label: "Mini-Team C", url: "https://docs.google.com/document/d/1b0yZtdXfGooT0eJDR3ffRU7mH25rNX0dXcloWe2ImS8/edit#heading=h.mini3" },
-    ]
-  },
-  {
-    id: 3,
-    name: "Group 3",
-    color: "#8A2C5A",
-    miniTeams: [
-      { label: "Mini-Team A", url: "https://docs.google.com/document/d/1pdYRvlRPvXEdHeoc_OaWstXGMhYy7uln6lLL3M59xks/edit#heading=h.mini1" },
-      { label: "Mini-Team B", url: "https://docs.google.com/document/d/1pdYRvlRPvXEdHeoc_OaWstXGMhYy7uln6lLL3M59xks/edit#heading=h.mini2" },
-      { label: "Mini-Team C", url: "https://docs.google.com/document/d/1pdYRvlRPvXEdHeoc_OaWstXGMhYy7uln6lLL3M59xks/edit#heading=h.mini3" },
-    ]
-  },
-  {
-    id: 4,
-    name: "Group 4",
-    color: "#8A5A2C",
-    miniTeams: [
-      { label: "Mini-Team A", url: "https://docs.google.com/document/d/1ZBNp_4LJ8HcwnC6jSJqxLpiy8OgfrrubtCCYJSoEe2Y/edit#heading=h.mini1" },
-      { label: "Mini-Team B", url: "https://docs.google.com/document/d/1ZBNp_4LJ8HcwnC6jSJqxLpiy8OgfrrubtCCYJSoEe2Y/edit#heading=h.mini2" },
-      { label: "Mini-Team C", url: "https://docs.google.com/document/d/1ZBNp_4LJ8HcwnC6jSJqxLpiy8OgfrrubtCCYJSoEe2Y/edit#heading=h.mini3" },
-    ]
-  },
-  {
-    id: 5,
-    name: "Group 5",
-    color: "#5A2C8A",
-    miniTeams: [
-      { label: "Mini-Team A", url: "https://docs.google.com/document/d/1qpaGNZQShWaVf7puNy6m-O_qubQ3LlGQbtxa7Dlyo-I/edit#heading=h.mini1" },
-      { label: "Mini-Team B", url: "https://docs.google.com/document/d/1qpaGNZQShWaVf7puNy6m-O_qubQ3LlGQbtxa7Dlyo-I/edit#heading=h.mini2" },
-      { label: "Mini-Team C", url: "https://docs.google.com/document/d/1qpaGNZQShWaVf7puNy6m-O_qubQ3LlGQbtxa7Dlyo-I/edit#heading=h.mini3" },
-    ]
-  },
-  {
-    id: 6,
-    name: "Group 6",
-    color: "#2C8A7A",
-    miniTeams: [
-      { label: "Mini-Team A", url: "https://docs.google.com/document/d/1QwCxTMeAxYmo7KqRQFqTGO2AMhEZRtCtTi3TVkTiT_8/edit#heading=h.mini1" },
-      { label: "Mini-Team B", url: "https://docs.google.com/document/d/1QwCxTMeAxYmo7KqRQFqTGO2AMhEZRtCtTi3TVkTiT_8/edit#heading=h.mini2" },
-      { label: "Mini-Team C", url: "https://docs.google.com/document/d/1QwCxTMeAxYmo7KqRQFqTGO2AMhEZRtCtTi3TVkTiT_8/edit#heading=h.mini3" },
-    ]
-  }
+{
+  id:1, name:"Group 1", color:"#2C5F8A",
+  topic:"Hope in Darkness",
+  miniTeams:[
+    {
+      label:"Mini-Team 1",
+      scriptures:[
+        { ref:"Psalm 22:24", text:"For He has not despised nor abhorred the affliction of the afflicted;\nNor has He hidden His face from him;\nBut when he cried to Him, He heard." },
+        { ref:"Lamentations 3:21–23", text:"This I recall to my mind,\nTherefore I have hope.\nThrough the Lord's mercies we are not consumed,\nBecause His compassions fail not.\nThey are new every morning;\nGreat is Your faithfulness." }
+      ],
+      commentarySource:"St. Ephrem the Syrian",
+      commentary:`St. Ephrem teaches that one of the greatest struggles of the human soul in suffering is the feeling of being forgotten or abandoned by God. When pain persists and relief is not immediate, the heart begins to question whether God still sees or hears. Yet Scripture directly contradicts this fear.
+
+The Psalm declares that God does not despise the afflicted. This is significant, because human beings often turn away from suffering — either their own or that of others — out of discomfort or helplessness. But God does not withdraw. He does not look away. He does not ignore the cry of the one who suffers.
+
+Ephrem explains that God's silence is not absence. There are moments when God does not immediately intervene, not because He has abandoned us, but because He is working in ways that are not yet visible. During these moments, hope must be rooted not in what we feel, but in what we know about God's character.
+
+Lamentations speaks from a place of deep grief, yet it deliberately chooses to "recall" truth. Hope is not presented as a natural emotional response, but as a conscious act of remembrance. The soul remembers that God's mercies are not exhausted, that His compassion does not fail, and that each day brings new grace.
+
+For Ephrem, this teaches that hope is sustained not by changing circumstances, but by unchanging truth. Even when everything feels uncertain, God remains faithful.`,
+      takeaway:"God has not turned away from you.\nEven in suffering, He sees, hears, and remains present."
+    },
+    {
+      label:"Mini-Team 2",
+      scriptures:[
+        { ref:"Psalm 42:5", text:"Why are you cast down, O my soul?\nAnd why are you disquieted within me?\nHope in God;\nFor I shall yet praise Him\nFor the help of His countenance." },
+        { ref:"Isaiah 9:2", text:"The people who walked in darkness\nHave seen a great light;\nThose who dwelt in the land of the shadow of death,\nUpon them a light has shined." }
+      ],
+      commentarySource:"St. Gregory of Nyssa",
+      commentary:`St. Gregory of Nyssa reflects deeply on the nature of darkness and light, teaching that darkness does not have substance of its own. It is not something that actively exists, but rather the absence of light. Therefore, when light appears, darkness does not resist it — it simply disappears.
+
+Applying this to the spiritual life, Gregory explains that moments of despair, confusion, or inner heaviness are like darkness within the soul. They feel overwhelming and consuming, yet they are not permanent realities. When God, who is the true Light, enters the soul, these states begin to change.
+
+Psalm 42 reveals an important spiritual practice: the soul speaks to itself. It questions its own despair and redirects itself toward hope. Gregory emphasizes that this is not denial of pain, but an act of spiritual discipline. The soul acknowledges its distress but refuses to remain in it without turning toward God.
+
+Isaiah's prophecy reveals that light comes not after darkness disappears, but into the darkness itself. This means that God does not wait for us to become strong, stable, or "ready." He meets us exactly where we are.
+
+Hope, therefore, is not the absence of struggle, but the presence of God within it.`,
+      takeaway:"Even in your lowest moments, light is already present.\nGod meets you where you are."
+    },
+    {
+      label:"Mini-Team 3",
+      scriptures:[
+        { ref:"Psalm 30:5", text:"For His anger is but for a moment,\nHis favor is for life;\nWeeping may endure for a night,\nBut joy comes in the morning." },
+        { ref:"John 1:5", text:"And the light shines in the darkness,\nAnd the darkness did not comprehend it." }
+      ],
+      commentarySource:"St. John Chrysostom",
+      commentary:`St. John Chrysostom teaches that suffering often feels permanent while we are inside it, yet in reality, it is temporary. The Psalm expresses this clearly — weeping may last for a time, but it does not define the final outcome.
+
+Chrysostom explains that God allows certain difficulties not to destroy us, but to refine and strengthen us. However, he is careful to remind that suffering is never the final word. God's favor, mercy, and restoration are greater and longer-lasting than any moment of hardship.
+
+In the Gospel of John, Christ is described as light shining in darkness. Chrysostom emphasizes that darkness does not overcome light because it has no real power against it. Even when darkness appears strong, it is ultimately powerless before the presence of light.
+
+This means that even when we do not yet see change, the presence of Christ is already at work. The transformation may not be immediate, but it is certain.`,
+      takeaway:"Your pain is real, but it is not permanent.\nGod's light is still working in your life."
+    },
+    {
+      label:"Mini-Team 4",
+      scriptures:[
+        { ref:"Psalm 27:1", text:"The Lord is my light and my salvation;\nWhom shall I fear?\nThe Lord is the strength of my life;\nOf whom shall I be afraid?" },
+        { ref:"Romans 5:3–4", text:"And not only that, but we also glory in tribulations,\nKnowing that tribulation produces perseverance;\nAnd perseverance, character;\nAnd character, hope." }
+      ],
+      commentarySource:"St. Paul the Apostle and the Fathers",
+      commentary:`St. Paul teaches that suffering is not meaningless. This is one of the most difficult teachings in the Christian life, because pain often feels chaotic and purposeless. However, Paul explains that God is able to work through suffering to produce endurance, character, and ultimately hope.
+
+The Fathers expand on this by teaching that endurance is not passive. It is an active trust in God during difficulty. Character is formed when a person continues to trust even when circumstances do not immediately improve.
+
+The Psalm declares that the Lord is our light and salvation. This means that fear, though natural, does not have to control us. Fear loses its power when we recognize that God is present and active in our lives.
+
+Hope, therefore, is not something that appears suddenly. It is formed gradually as we continue to trust God through each step of difficulty.`,
+      takeaway:"Your struggle is not meaningless.\nGod is shaping strength and hope within you."
+    },
+    {
+      label:"Mini-Team 5",
+      scriptures:[
+        { ref:"Psalm 34:18", text:"The Lord is near to those who have a broken heart,\nAnd saves such as have a contrite spirit." },
+        { ref:"John 16:33", text:"In the world you will have tribulation;\nBut be of good cheer, I have overcome the world." }
+      ],
+      commentarySource:"St. Isaac the Syrian",
+      commentary:`St. Isaac teaches that suffering does not push God away, but draws Him closer. While human beings often withdraw from pain — either their own or that of others — God does the opposite. He moves toward the brokenhearted.
+
+A "broken heart" in Scripture is not a sign of failure, but of openness. It is a heart that recognizes its need and turns toward God. Isaac explains that it is often through suffering that a person becomes more aware of God's presence.
+
+Christ's words in John 16 are deeply realistic. He does not promise a life without tribulation. Instead, He promises that He has overcome the world. This means that while suffering exists, it does not have ultimate authority.
+
+Peace, therefore, is not found in avoiding hardship, but in trusting the One who has overcome it.`,
+      takeaway:"God is especially near to you in your pain.\nYou are not alone in your struggle."
+    },
+    {
+      label:"Mini-Team 6",
+      scriptures:[
+        { ref:"Psalm 40:1–2", text:"I waited patiently for the Lord;\nAnd He inclined to me,\nAnd heard my cry.\nHe also brought me up out of a horrible pit,\nOut of the miry clay,\nAnd set my feet upon a rock,\nAnd established my steps." },
+        { ref:"2 Corinthians 4:8–9", text:"We are hard-pressed on every side, yet not crushed;\nWe are perplexed, but not in despair;\nPersecuted, but not forsaken;\nStruck down, but not destroyed." }
+      ],
+      commentarySource:"St. Shenouda the Archimandrite",
+      commentary:`St. Shenouda teaches that the Christian life includes real struggle, but never abandonment. The language of being "pressed," "perplexed," or "struck down" reflects genuine hardship. These are not symbolic experiences, but real ones.
+
+However, the distinction is crucial: we are not crushed, not in despair, not forsaken, not destroyed. God's presence creates a boundary that suffering cannot cross. It may affect us, but it cannot ultimately overcome us.
+
+The Psalm describes a process — waiting, crying, being lifted, and being established. Shenouda emphasizes that God's work often unfolds gradually. The lifting out of the "pit" is not always immediate, but it is certain.
+
+Patience, therefore, is not passive waiting, but trusting that God is actively working even when we do not yet see the outcome.`,
+      takeaway:"You may feel overwhelmed, but you are not abandoned.\nGod is lifting you, step by step."
+    }
+  ]
+},
+{
+  id:2, name:"Group 2", color:"#4A7A35",
+  topic:"Love & Being Seen",
+  miniTeams:[
+    {
+      label:"Mini-Team 1",
+      scriptures:[
+        { ref:"Psalm 139:1–4", text:"O Lord, You have searched me and known me.\nYou know my sitting down and my rising up;\nYou understand my thoughts from afar.\nYou comprehend my path and my lying down,\nAnd are acquainted with all my ways.\nFor there is not a word on my tongue,\nBut behold, O Lord, You know it altogether." },
+        { ref:"Isaiah 43:1", text:"But now, thus says the Lord, who created you, O Jacob,\nAnd He who formed you, O Israel:\n'Fear not, for I have redeemed you;\nI have called you by your name;\nYou are Mine.'" }
+      ],
+      commentarySource:"St. Athanasius the Apostolic",
+      commentary:`St. Athanasius teaches that God's knowledge of humanity is inseparable from His act of creation. God does not come to know us gradually, as human beings come to know one another. Rather, He knows us completely because He is the One who brought us into being and continues to sustain us at every moment. Our existence itself is not independent from Him; it is held continuously in His will and love.
+
+This means that God's knowledge is not distant observation, but intimate presence. He knows not only our actions, but our thoughts before they are fully formed, our words before they are spoken, and our struggles before they are visible to others. Yet this complete knowledge does not lead to rejection. Unlike human relationships, where being fully known can lead to judgment or distance, God's knowledge is always united with mercy.
+
+Isaiah deepens this truth by revealing that God calls each person by name. This is not a general statement about humanity, but a personal one. To be called by name is to be recognized, claimed, and loved individually. God does not relate to us as a crowd, but as persons. Even in moments when we feel overlooked, unseen, or misunderstood, God's knowledge of us remains constant.
+
+To be known by God, therefore, is not to be exposed in shame, but to be held in love. His knowledge is protective, sustaining, and deeply personal.`,
+      takeaway:"You are fully known, and still fully loved.\nGod sees you, remembers you, and calls you His."
+    },
+    {
+      label:"Mini-Team 2",
+      scriptures:[
+        { ref:"Psalm 139:13–14", text:"For You formed my inward parts;\nYou covered me in my mother's womb.\nI will praise You, for I am fearfully and wonderfully made;\nMarvelous are Your works,\nAnd that my soul knows very well." },
+        { ref:"John 15:9", text:"As the Father loved Me, I also have loved you; abide in My love." }
+      ],
+      commentarySource:"St. Cyril of Alexandria",
+      commentary:`St. Cyril teaches that the dignity of the human person is rooted in divine intention. Humanity is not an accident, nor the result of chance, but is formed deliberately by God. Each person is created with care, purpose, and meaning, even if that purpose is not immediately understood.
+
+The Psalm emphasizes that God's involvement in our lives begins even before we are aware of ourselves. From the very beginning, we are known, shaped, and sustained by Him. This reveals that our worth is not something we achieve over time, but something given to us from the moment of our creation.
+
+In John 15, Christ invites us to "abide" in His love. St. Cyril explains that this abiding is not passive, but relational. It means remaining rooted in the truth that we are loved by God, rather than seeking identity in temporary and unstable things such as success, approval, or comparison with others.
+
+Human beings often struggle with self-worth because they measure themselves according to changing standards. However, God's love is not based on performance. It does not increase when we succeed, nor decrease when we fail. It remains constant because it comes from God Himself.
+
+To live in this love is to begin seeing oneself not through the lens of the world, but through the truth of God's creation and care.`,
+      takeaway:"You are intentionally created and deeply loved.\nYour worth does not change."
+    },
+    {
+      label:"Mini-Team 3",
+      scriptures:[
+        { ref:"Psalm 23:1–3", text:"The Lord is my shepherd; I shall not want.\nHe makes me to lie down in green pastures;\nHe leads me beside the still waters.\nHe restores my soul;\nHe leads me in the paths of righteousness\nFor His name's sake." },
+        { ref:"Romans 8:38–39", text:"For I am persuaded that neither death nor life, nor angels nor principalities nor powers, nor things present nor things to come,\nNor height nor depth, nor any other created thing, shall be able to separate us from the love of God which is in Christ Jesus our Lord." }
+      ],
+      commentarySource:"St. Augustine of Hippo",
+      commentary:`St. Augustine teaches that God's love is not dependent on human condition, but is rooted in God's own nature. Human love often changes — it can weaken, fade, or be withdrawn — but God's love does not change because He Himself does not change.
+
+The image of God as a shepherd reveals a relationship of care, guidance, and restoration. A shepherd does not abandon the sheep when they wander; he seeks them, protects them, and brings them back. Augustine explains that this reflects God's relationship with humanity. Even when we feel lost, God continues to guide and restore.
+
+Romans 8 declares that nothing in all creation can separate us from God's love. This includes not only external circumstances such as suffering or hardship, but also internal struggles such as fear, doubt, or weakness. God's love is not fragile. It is not broken by difficulty, nor withdrawn by failure.
+
+Even when we feel distant from God, it is not because He has moved away, but because we have lost awareness of His presence. Yet even then, He remains near, continuing to guide and restore.`,
+      takeaway:"Nothing can separate you from God's love.\nYou are guided and cared for, even when you feel lost."
+    },
+    {
+      label:"Mini-Team 4",
+      scriptures:[
+        { ref:"Psalm 16:8", text:"I have set the Lord always before me;\nBecause He is at my right hand I shall not be moved." },
+        { ref:"1 John 4:9–10", text:"In this the love of God was manifested toward us, that God has sent His only begotten Son into the world, that we might live through Him.\nIn this is love, not that we loved God, but that He loved us and sent His Son to be the propitiation for our sins." }
+      ],
+      commentarySource:"St. Irenaeus of Lyons",
+      commentary:`St. Irenaeus teaches that love begins with God, not with humanity. Human beings often believe that love must be earned, deserved, or proven. However, Scripture reveals that God loved us first, before any response from us.
+
+The sending of Christ into the world is the fullest expression of this love. God does not remain distant from human suffering, but enters into it. He does not wait for humanity to become worthy, but acts out of His own compassion.
+
+To "set the Lord always before me" means to live with the awareness of this love. Stability in life does not come from controlling circumstances, but from anchoring oneself in the truth that God is present and active.
+
+When a person understands that love is given, not earned, their relationship with God changes. It becomes less about striving and more about receiving and responding.`,
+      takeaway:"You don't have to earn God's love.\nHe loved you first."
+    },
+    {
+      label:"Mini-Team 5",
+      scriptures:[
+        { ref:"Psalm 34:5", text:"They looked to Him and were radiant,\nAnd their faces were not ashamed." },
+        { ref:"Zephaniah 3:17", text:"The Lord your God in your midst, the Mighty One, will save;\nHe will rejoice over you with gladness,\nHe will quiet you with His love,\nHe will rejoice over you with singing." }
+      ],
+      commentarySource:"St. Ephrem the Syrian",
+      commentary:`St. Ephrem describes God's love as deeply personal and joyful. God does not merely tolerate His people; He delights in them. This is a profound contrast to the way many people perceive God — as distant, strict, or indifferent.
+
+The image of God rejoicing over His people challenges the idea that we are a burden to Him. Instead, we are cherished. Ephrem emphasizes that turning toward God brings light and healing. Shame, which often causes people to hide, is replaced by restoration when one encounters God's love.
+
+To become "radiant" is not about outward appearance, but about the transformation of the soul. When a person turns toward God, they begin to experience dignity, peace, and renewal.
+
+God's love does not expose us to condemn us, but to heal us.`,
+      takeaway:"You are not a burden to God.\nYou are someone He delights in."
+    },
+    {
+      label:"Mini-Team 6",
+      scriptures:[
+        { ref:"Psalm 27:10", text:"When my father and my mother forsake me,\nThen the Lord will take care of me." },
+        { ref:"John 15:8–9", text:"By this My Father is glorified, that you bear much fruit; so you will be My disciples.\nAs the Father loved Me, I also have loved you; abide in My love." }
+      ],
+      commentarySource:"St. John Chrysostom",
+      commentary:`St. John Chrysostom teaches that human relationships, though meaningful, are limited and often fragile. People may fail, disappoint, or even abandon us. This is part of the human condition. However, God's love is not subject to these limitations.
+
+Even in the most painful experiences of rejection or loneliness, God remains present. Chrysostom emphasizes that God's care is not dependent on human faithfulness. When others fail, God does not.
+
+To "abide" in God's love means to remain rooted in something unchanging. It is to place trust not in temporary circumstances, but in the enduring faithfulness of God.
+
+This does not remove the pain of human loss, but it provides a deeper foundation — one that cannot be taken away.`,
+      takeaway:"Even when others fail you, God remains.\nYou are never truly alone."
+    }
+  ]
+},
+{
+  id:3, name:"Group 3", color:"#8A2C5A",
+  topic:"Identity & Dignity",
+  miniTeams:[
+    {
+      label:"Mini-Team 1",
+      scriptures:[
+        { ref:"Psalm 8:4–6", text:"What is man that You are mindful of him,\nAnd the son of man that You visit him?\nFor You have made him a little lower than the angels,\nAnd You have crowned him with glory and honor.\nYou have made him to have dominion over the works of Your hands;\nYou have put all things under his feet." },
+        { ref:"Ephesians 2:10", text:"For we are His workmanship, created in Christ Jesus for good works, which God prepared beforehand that we should walk in them." }
+      ],
+      commentarySource:"St. Irenaeus of Lyons",
+      commentary:`St. Irenaeus teaches that the dignity of the human person is rooted in being created in the image and likeness of God. Humanity is not insignificant, even though we often feel small or overlooked. The Psalm itself expresses this tension — questioning why God would care for humanity, yet affirming that He does, and that He has crowned humanity with glory and honor.
+
+Irenaeus explains that this "glory" is not something humanity created for itself, but something given by God. Human worth is therefore not based on achievement, status, or recognition, but on divine intention. Each person is created deliberately, with purpose, and is invited into participation in God's work.
+
+Ephesians deepens this truth by describing us as God's "workmanship." This word implies careful creation, like a craftsman shaping something with intention and care. God does not create randomly; He forms each person with purpose and prepares a path for them to walk in.
+
+Even when a person feels lost, directionless, or without value, this truth remains unchanged. Their worth does not disappear simply because they do not see it. It is already established in God's act of creation.`,
+      takeaway:"You are not insignificant.\nYou were created with intention, dignity, and purpose."
+    },
+    {
+      label:"Mini-Team 2",
+      scriptures:[
+        { ref:"Psalm 16:5–6", text:"O Lord, You are the portion of my inheritance and my cup;\nYou maintain my lot.\nThe lines have fallen to me in pleasant places;\nYes, I have a good inheritance." },
+        { ref:"1 Peter 2:9", text:"But you are a chosen generation, a royal priesthood, a holy nation, His own special people, that you may proclaim the praises of Him who called you out of darkness into His marvelous light." }
+      ],
+      commentarySource:"St. Athanasius the Apostolic",
+      commentary:`St. Athanasius teaches that identity is not something we construct for ourselves, but something we receive from God. In a world where people constantly define themselves through achievements, relationships, or social status, Scripture offers a different foundation: we are chosen by God.
+
+The Psalm speaks of inheritance — something given, not earned. Athanasius explains that God Himself is our portion. This means that our value and security are not rooted in temporary things, but in our relationship with Him.
+
+In 1 Peter, the language becomes even more direct: we are a chosen people, a royal priesthood. This is not reserved for a select few, but describes all who belong to God. To be "chosen" does not mean others are rejected, but that God calls each person personally into relationship with Him.
+
+Many people struggle with feeling unwanted or unimportant. Athanasius emphasizes that this struggle often comes from seeking identity in places that cannot sustain it. But when identity is rooted in God, it becomes stable and unshaken.`,
+      takeaway:"You are chosen and valued.\nYour identity is secure in God."
+    },
+    {
+      label:"Mini-Team 3",
+      scriptures:[
+        { ref:"Psalm 139:13–14", text:"For You formed my inward parts;\nYou covered me in my mother's womb.\nI will praise You, for I am fearfully and wonderfully made;\nMarvelous are Your works,\nAnd that my soul knows very well." },
+        { ref:"Isaiah 49:16", text:"See, I have inscribed you on the palms of My hands;\nYour walls are continually before Me." }
+      ],
+      commentarySource:"St. Cyril of Alexandria",
+      commentary:`St. Cyril emphasizes that God's relationship with humanity is deeply personal and intentional. The Psalm reveals that God's involvement in our lives begins even before we are aware of ourselves. We are not only created, but carefully formed.
+
+Isaiah presents a powerful image — being "inscribed" on the palms of God's hands. Cyril explains that this is not literal, but symbolic of constant remembrance. God does not forget His people. Even when they feel distant, overlooked, or abandoned, they remain present before Him.
+
+Human beings often struggle with feeling forgotten or unseen, especially in times of hardship. Cyril teaches that this feeling does not reflect reality, but perception. God's awareness of us does not fade or diminish.
+
+To understand this truth is to begin releasing the fear of being forgotten. Our lives are held continually before God, not occasionally remembered.`,
+      takeaway:"You are not forgotten.\nGod remembers you constantly."
+    },
+    {
+      label:"Mini-Team 4",
+      scriptures:[
+        { ref:"Psalm 23:1", text:"The Lord is my shepherd; I shall not want." },
+        { ref:"Galatians 3:26–27", text:"For you are all sons of God through faith in Christ Jesus.\nFor as many of you as were baptized into Christ have put on Christ." }
+      ],
+      commentarySource:"St. Augustine of Hippo",
+      commentary:`St. Augustine teaches that belonging is one of the deepest needs of the human soul. People often search for belonging in relationships, communities, or achievements, yet these can be unstable and incomplete.
+
+Scripture reveals that true belonging is found in God. The image of the shepherd reflects care, protection, and guidance. A sheep belongs to the shepherd not because of what it does, but because of its relationship to him.
+
+In Galatians, this belonging is described as adoption. Through Christ, we are brought into the family of God. Augustine emphasizes that this is not symbolic language, but a real transformation of identity. We are no longer outsiders, but children of God.
+
+This means that belonging is not something we earn or maintain through effort. It is given, and it remains, even when we feel unworthy.`,
+      takeaway:"You belong to God.\nYou are part of His family."
+    },
+    {
+      label:"Mini-Team 5",
+      scriptures:[
+        { ref:"Psalm 34:8", text:"Oh, taste and see that the Lord is good;\nBlessed is the man who trusts in Him." },
+        { ref:"Romans 8:15", text:"For you did not receive the spirit of bondage again to fear,\nBut you received the Spirit of adoption by whom we cry out, 'Abba, Father.'" }
+      ],
+      commentarySource:"St. Gregory of Nyssa",
+      commentary:`St. Gregory teaches that the human relationship with God is not meant to be one of fear, but of closeness and trust. The language of adoption transforms how we understand God — not as distant or harsh, but as a Father.
+
+Gregory explains that fear often comes from misunderstanding God's nature. When people see God primarily as a judge, they relate to Him with anxiety and distance. But when they understand Him as Father, their relationship changes to one of trust and openness.
+
+The Psalm invites us to "taste and see" that the Lord is good. This implies experience, not just knowledge. God's goodness is not meant to be an abstract idea, but something personally encountered.
+
+To live as adopted children is to move away from fear and toward trust.`,
+      takeaway:"You are not meant to live in fear.\nYou are invited into a relationship of trust with God."
+    },
+    {
+      label:"Mini-Team 6",
+      scriptures:[
+        { ref:"Psalm 100:3", text:"Know that the Lord, He is God;\nIt is He who has made us, and not we ourselves;\nWe are His people and the sheep of His pasture." },
+        { ref:"John 10:14", text:"I am the good shepherd; and I know My sheep, and am known by My own." }
+      ],
+      commentarySource:"St. John Chrysostom",
+      commentary:`St. John Chrysostom teaches that one of the greatest comforts in the spiritual life is knowing that God relates to us personally. We are not unknown or anonymous to Him. The image of the shepherd and the sheep emphasizes recognition and relationship.
+
+Chrysostom explains that just as a shepherd knows each sheep individually, God knows each person — their struggles, their thoughts, and their needs. This knowledge is not distant, but relational.
+
+Many people feel unseen in the world, especially in large communities or difficult circumstances. This can lead to feelings of isolation or insignificance. Chrysostom reminds us that while human recognition may fail, divine recognition does not.
+
+To be known by God is to be held in a relationship that is personal, constant, and faithful.`,
+      takeaway:"You are known personally by God.\nYou are not invisible to Him."
+    }
+  ]
+},
+{
+  id:4, name:"Group 4", color:"#8A5A2C",
+  topic:"Trust & Surrender",
+  miniTeams:[
+    {
+      label:"Mini-Team 1",
+      scriptures:[
+        { ref:"Proverbs 3:5–6", text:"Trust in the Lord with all your heart,\nAnd lean not on your own understanding;\nIn all your ways acknowledge Him,\nAnd He shall direct your paths." },
+        { ref:"Psalm 37:5", text:"Commit your way to the Lord,\nTrust also in Him,\nAnd He shall bring it to pass." }
+      ],
+      commentarySource:"St. Isaac the Syrian",
+      commentary:`St. Isaac teaches that one of the greatest obstacles in the spiritual life is self-reliance. Human beings naturally trust their own understanding, trying to control outcomes, predict the future, and secure stability through their own efforts. However, this often leads to anxiety, confusion, and inner unrest, because our understanding is limited.
+
+To "trust in the Lord with all your heart" is not simply an emotional statement — it is a deliberate act of surrender. It means releasing the need to fully understand everything before moving forward. St. Isaac explains that true trust begins where personal control ends.
+
+This does not mean abandoning responsibility, but reordering the heart. Instead of relying primarily on one's own reasoning, the person begins to depend on God's wisdom and guidance. The Psalm reinforces this by calling us to "commit" our way to the Lord — to place our direction, decisions, and uncertainties into His hands.
+
+God's guidance is often not immediate or obvious. St. Isaac emphasizes that trust requires patience. The path becomes clear not all at once, but step by step, as a person continues to rely on God.`,
+      takeaway:"You don't need to have everything figured out.\nTrust God with what you cannot control."
+    },
+    {
+      label:"Mini-Team 2",
+      scriptures:[
+        { ref:"Matthew 11:28–30", text:"Come to Me, all you who labor and are heavy laden, and I will give you rest.\nTake My yoke upon you and learn from Me, for I am gentle and lowly in heart,\nAnd you will find rest for your souls.\nFor My yoke is easy and My burden is light." },
+        { ref:"Psalm 55:22", text:"Cast your burden on the Lord,\nAnd He shall sustain you;\nHe shall never permit the righteous to be moved." }
+      ],
+      commentarySource:"St. Anthony the Great",
+      commentary:`St. Anthony teaches that many people carry burdens they were never meant to carry alone. These burdens can be external — responsibilities, hardships, expectations — but also internal, such as anxiety, fear, and emotional weight.
+
+Christ's invitation is direct and personal: "Come to Me." This is not a command rooted in obligation, but an invitation rooted in compassion. St. Anthony emphasizes that God does not wait for us to become strong before approaching Him. He calls us in our weakness, weariness, and exhaustion.
+
+The "yoke" of Christ is described as light not because life becomes easy, but because it is no longer carried alone. A yoke is meant to be shared, and Christ places Himself alongside us.
+
+Casting our burden on the Lord requires humility. It means acknowledging that we cannot carry everything ourselves. St. Anthony explains that many people struggle to do this because they fear losing control. However, true rest comes only when we release what we cannot sustain.`,
+      takeaway:"You don't have to carry everything alone.\nGod invites you to rest in Him."
+    },
+    {
+      label:"Mini-Team 3",
+      scriptures:[
+        { ref:"Isaiah 26:3", text:"You will keep him in perfect peace,\nWhose mind is stayed on You,\nBecause he trusts in You." },
+        { ref:"Psalm 23:2–3", text:"He makes me to lie down in green pastures;\nHe leads me beside the still waters.\nHe restores my soul." }
+      ],
+      commentarySource:"St. Macarius of Egypt",
+      commentary:`St. Macarius teaches that peace is not primarily the result of external conditions, but of inner orientation. A person may be surrounded by uncertainty, yet still experience peace if their heart is rooted in God.
+
+Isaiah speaks of a "mind stayed" on God — a mind that is fixed, focused, and anchored. Macarius explains that the human mind is often restless, moving constantly between worries, fears, and distractions. This restlessness prevents the soul from experiencing peace.
+
+Trust redirects the mind. Instead of dwelling on uncertainty, the person learns to return again and again to God. This is not a one-time action, but a continual practice.
+
+The imagery of still waters and green pastures reflects restoration. God does not only guide externally, but heals internally. As trust grows, the soul begins to settle, and peace becomes possible even in difficult circumstances.`,
+      takeaway:"Peace comes when your heart rests in God.\nTrust brings stillness to a restless soul."
+    },
+    {
+      label:"Mini-Team 4",
+      scriptures:[
+        { ref:"Jeremiah 17:7–8", text:"Blessed is the man who trusts in the Lord,\nAnd whose hope is the Lord.\nFor he shall be like a tree planted by the waters,\nWhich spreads out its roots by the river,\nAnd will not fear when heat comes;\nBut its leaf will be green,\nAnd will not be anxious in the year of drought,\nNor will cease from yielding fruit." },
+        { ref:"Psalm 46:10", text:"Be still, and know that I am God." }
+      ],
+      commentarySource:"St. Ephrem the Syrian",
+      commentary:`St. Ephrem teaches that trust in God creates stability that is not dependent on circumstances. The image of the tree planted by water is deeply intentional — it represents a life that is rooted in something constant.
+
+Difficult seasons are inevitable. Heat, drought, and hardship are part of life. However, the tree does not wither because its roots are connected to a steady source of life. Ephrem explains that this source is God Himself.
+
+To "be still" is not simply to be quiet outwardly, but to quiet the inner turmoil of the heart. Many people struggle with stillness because their minds are filled with worry and fear. Stillness requires trust — trusting that God is present and active even when we are not striving.
+
+When a person learns to trust in this way, anxiety begins to lose its power. Stability comes not from controlling circumstances, but from remaining rooted in God.`,
+      takeaway:"You can remain steady even in difficult seasons.\nStay rooted in God."
+    },
+    {
+      label:"Mini-Team 5",
+      scriptures:[
+        { ref:"Psalm 62:8", text:"Trust in Him at all times, you people;\nPour out your heart before Him;\nGod is a refuge for us." },
+        { ref:"Luke 12:25–26", text:"And which of you by worrying can add one cubit to his stature?\nIf you then are not able to do the least, why are you anxious for the rest?" }
+      ],
+      commentarySource:"St. Augustine of Hippo",
+      commentary:`St. Augustine teaches that anxiety often comes from attempting to control what is beyond our power. Human beings naturally worry about the future, outcomes, and uncertainties, yet this worry does not actually change anything.
+
+Christ's words in Luke confront this reality directly. Worry does not add to our lives; it burdens them. Augustine explains that worry often arises when we place our trust in ourselves rather than in God.
+
+The Psalm invites us to "pour out" our hearts before God. This is an expression of honesty and vulnerability. Trust is not pretending everything is fine, but bringing everything — fears, concerns, and struggles — before God.
+
+God as a "refuge" means a place of safety and protection. When a person begins to trust God in this way, anxiety is gradually replaced by peace.`,
+      takeaway:"You don't have to carry your worries alone.\nBring everything to God."
+    },
+    {
+      label:"Mini-Team 6",
+      scriptures:[
+        { ref:"Psalm 121:1–2", text:"I will lift up my eyes to the hills—\nFrom whence comes my help?\nMy help comes from the Lord,\nWho made heaven and earth." },
+        { ref:"Romans 8:28", text:"And we know that all things work together for good to those who love God, to those who are the called according to His purpose." }
+      ],
+      commentarySource:"St. Athanasius the Apostolic",
+      commentary:`St. Athanasius teaches that God's providence extends beyond what we can immediately understand. Human beings often struggle when events do not make sense, especially when circumstances seem difficult or unfair.
+
+The Psalm expresses a turning point — lifting one's eyes away from immediate surroundings and toward God. Athanasius explains that this shift in perspective is essential. When we focus only on our situation, we become overwhelmed. When we look toward God, we begin to see beyond the present moment.
+
+Romans 8:28 affirms that God is able to work all things for good. This does not mean that all things are good in themselves, but that God can bring good even out of difficult situations.
+
+Trusting in God's providence requires patience and humility. We may not understand immediately, but we trust that God is working beyond what we can see.`,
+      takeaway:"God is working, even when you don't understand.\nYou can trust Him with your future."
+    }
+  ]
+},
+{
+  id:5, name:"Group 5", color:"#5A2C8A",
+  topic:"Strength & Endurance",
+  miniTeams:[
+    {
+      label:"Mini-Team 1",
+      scriptures:[
+        { ref:"Isaiah 40:31", text:"But those who wait on the Lord\nShall renew their strength;\nThey shall mount up with wings like eagles,\nThey shall run and not be weary,\nThey shall walk and not faint." },
+        { ref:"Psalm 27:14", text:"Wait on the Lord;\nBe of good courage,\nAnd He shall strengthen your heart;\nWait, I say, on the Lord!" }
+      ],
+      commentarySource:"St. Shenouda the Archimandrite",
+      commentary:`St. Shenouda teaches that waiting is one of the most difficult aspects of the spiritual life because it requires patience without immediate results. Human beings naturally desire quick answers, visible progress, and immediate relief. However, God often works through processes that unfold over time.
+
+To "wait on the Lord" is not passive inactivity. It is an active trust — continuing to believe, to pray, and to remain faithful even when change is not yet visible. Shenouda explains that during these seasons, God is strengthening the heart internally, even if outward circumstances remain the same.
+
+Isaiah describes this strengthening as a renewal. This means that strength is not something we produce on our own, but something given by God. The imagery of rising like eagles reflects a transformation — moving from exhaustion to endurance.
+
+The repetition in the Psalm — "wait, I say, on the Lord" — emphasizes that this is not easy. It requires persistence. But in that persistence, God builds a deeper, more lasting strength.`,
+      takeaway:"Waiting is not wasted time.\nGod is strengthening you in the process."
+    },
+    {
+      label:"Mini-Team 2",
+      scriptures:[
+        { ref:"Philippians 4:13", text:"I can do all things through Christ who strengthens me." },
+        { ref:"Psalm 18:32–33", text:"It is God who arms me with strength,\nAnd makes my way perfect.\nHe makes my feet like the feet of deer,\nAnd sets me on my high places." }
+      ],
+      commentarySource:"St. Paul the Apostle and the Fathers",
+      commentary:`St. Paul teaches that strength in the Christian life does not originate from the individual, but from Christ. This is an important distinction, because human strength is limited and often unreliable. People may feel strong one moment and weak the next.
+
+The strength Paul describes is not about accomplishing anything independently, but about enduring and overcoming through Christ. The Psalm reinforces this by describing God as the one who "arms" us with strength. This implies that strength is given, not generated.
+
+The imagery of steady footing — like the feet of a deer — reflects stability in difficult terrain. Life often presents uneven, uncertain paths, yet God provides the strength needed to navigate them.
+
+The Fathers emphasize that this strength does not remove difficulty, but enables us to endure it with confidence. It is not about becoming self-sufficient, but about becoming God-dependent.`,
+      takeaway:"You are not expected to be strong on your own.\nGod gives you the strength you need."
+    },
+    {
+      label:"Mini-Team 3",
+      scriptures:[
+        { ref:"2 Corinthians 12:9", text:"My grace is sufficient for you,\nFor My strength is made perfect in weakness." },
+        { ref:"Psalm 46:1", text:"God is our refuge and strength,\nA very present help in trouble." }
+      ],
+      commentarySource:"St. John Chrysostom",
+      commentary:`St. John Chrysostom teaches that weakness is not a barrier to God's work, but often the very place where His power is revealed most clearly. Human beings tend to avoid weakness, seeing it as something to hide or overcome quickly. However, Scripture presents weakness differently.
+
+When Paul speaks of God's strength being made perfect in weakness, he is revealing a deeper truth: when human strength is insufficient, God's strength becomes evident. Chrysostom explains that this does not glorify weakness itself, but highlights God's ability to work within it.
+
+The Psalm describes God as a "very present help." This means that God is not distant during times of trouble. He is near, active, and involved.
+
+For Chrysostom, this teaches that we do not need to wait until we feel strong to approach God. We can come to Him exactly as we are, trusting that His grace is enough.`,
+      takeaway:"Your weakness does not disqualify you.\nGod's strength meets you there."
+    },
+    {
+      label:"Mini-Team 4",
+      scriptures:[
+        { ref:"Romans 8:18", text:"For I consider that the sufferings of this present time are not worthy to be compared with the glory which shall be revealed in us." },
+        { ref:"Psalm 34:19", text:"Many are the afflictions of the righteous,\nBut the Lord delivers him out of them all." }
+      ],
+      commentarySource:"St. Gregory of Nyssa",
+      commentary:`St. Gregory teaches that suffering must be understood in light of eternity. When viewed only from a present perspective, suffering can seem overwhelming and without meaning. However, when seen in relation to what God is preparing, its weight begins to shift.
+
+Paul does not deny suffering — he acknowledges it clearly. But he compares it to the glory that is to come and concludes that it is not worthy of comparison. Gregory explains that this does not minimize pain, but reframes it.
+
+The Psalm reminds us that afflictions are real and frequent. Faith does not eliminate hardship. However, God's deliverance is also real. Deliverance may not always be immediate, but it is certain.
+
+Endurance is sustained by hope — the confidence that what lies ahead is greater than what we are currently experiencing.`,
+      takeaway:"What you are going through is not the end of your story.\nSomething greater is ahead."
+    },
+    {
+      label:"Mini-Team 5",
+      scriptures:[
+        { ref:"Joshua 1:9", text:"Be strong and of good courage; do not be afraid, nor be dismayed,\nFor the Lord your God is with you wherever you go." },
+        { ref:"Psalm 91:1–2", text:"He who dwells in the secret place of the Most High\nShall abide under the shadow of the Almighty.\nI will say of the Lord, 'He is my refuge and my fortress;\nMy God, in Him I will trust.'" }
+      ],
+      commentarySource:"St. Anthony the Great",
+      commentary:`St. Anthony teaches that courage in the spiritual life does not come from the absence of fear, but from the presence of God. Fear is a natural human response, especially in uncertain or challenging situations. However, God's command to "be strong and courageous" is grounded in His promise to be present.
+
+The Psalm describes dwelling in the presence of God as being under His protection. This does not mean that difficulties will not arise, but that the person is not facing them alone.
+
+Anthony explains that courage grows as a person becomes more aware of God's presence. The more we trust that God is with us, the less power fear has over us.
+
+Courage, therefore, is not something we force within ourselves, but something that grows through trust.`,
+      takeaway:"You don't have to be fearless.\nYou just need to trust that God is with you."
+    },
+    {
+      label:"Mini-Team 6",
+      scriptures:[
+        { ref:"Hebrews 12:1", text:"Let us lay aside every weight, and the sin which so easily ensnares us,\nAnd let us run with endurance the race that is set before us." },
+        { ref:"Psalm 119:28", text:"My soul melts from heaviness;\nStrengthen me according to Your word." }
+      ],
+      commentarySource:"St. Isaac the Syrian",
+      commentary:`St. Isaac teaches that endurance is not simply about continuing forward, but about doing so with purpose and awareness. The Christian life is described as a race, not because it is competitive, but because it requires persistence.
+
+The instruction to "lay aside every weight" reflects the reality that some burdens slow us down unnecessarily. These may be habits, distractions, or internal struggles that make the journey heavier than it needs to be.
+
+Isaac explains that endurance is strengthened through reliance on God's word. When the soul feels heavy, discouraged, or overwhelmed, it is not left without help. God's word provides strength, direction, and renewal.
+
+Endurance is not about perfection, but about continuing — step by step — even when it is difficult.`,
+      takeaway:"You don't have to run perfectly.\nJust keep going — God will strengthen you."
+    }
+  ]
+},
+{
+  id:6, name:"Group 6", color:"#2C8A7A",
+  topic:"Peace & Anxiety",
+  miniTeams:[
+    {
+      label:"Mini-Team 1",
+      scriptures:[
+        { ref:"Philippians 4:6–7", text:"Be anxious for nothing, but in everything by prayer and supplication, with thanksgiving, let your requests be made known to God;\nAnd the peace of God, which surpasses all understanding, will guard your hearts and minds through Christ Jesus." },
+        { ref:"Psalm 46:1–2", text:"God is our refuge and strength,\nA very present help in trouble.\nTherefore we will not fear,\nEven though the earth be removed,\nAnd though the mountains be carried into the midst of the sea." }
+      ],
+      commentarySource:"St. Macarius of Egypt",
+      commentary:`St. Macarius teaches that anxiety arises when the heart becomes divided — pulled in many directions by fear, uncertainty, and the desire to control outcomes. The human mind naturally tries to solve everything on its own, and when it cannot, it becomes restless.
+
+St. Paul does not simply say "do not be anxious" as a command without direction. He provides a path: prayer, supplication, and thanksgiving. Macarius explains that prayer gathers the scattered thoughts of the mind and brings them into unity before God. Instead of carrying many concerns internally, the person begins to place them into God's hands.
+
+Thanksgiving is especially important. It shifts the focus from what is lacking to what has already been given. This does not deny difficulty, but reorients the heart toward trust.
+
+The peace that follows is described as surpassing understanding. This means it is not dependent on circumstances making sense. It is a peace that exists even when situations remain unresolved.
+
+God as a "refuge" reinforces this truth. A refuge does not remove the storm, but provides safety within it.`,
+      takeaway:"You don't have to carry your anxiety alone.\nBring everything to God — He will guard your heart."
+    },
+    {
+      label:"Mini-Team 2",
+      scriptures:[
+        { ref:"John 14:27", text:"Peace I leave with you, My peace I give to you; not as the world gives do I give to you.\nLet not your heart be troubled, neither let it be afraid." },
+        { ref:"Psalm 4:8", text:"I will both lie down in peace, and sleep;\nFor You alone, O Lord, make me dwell in safety." }
+      ],
+      commentarySource:"St. Augustine of Hippo",
+      commentary:`St. Augustine teaches that there are two kinds of peace: the peace of the world and the peace of God. The peace of the world depends on circumstances — when things are stable, predictable, and comfortable. However, this kind of peace is fragile and easily disturbed.
+
+Christ offers a different kind of peace — one that does not depend on external conditions. Augustine explains that this peace comes from being rightly ordered toward God. When the heart is aligned with God, it begins to experience rest, even when life is uncertain.
+
+The ability to "lie down in peace" reflects a deep trust. Sleep is one of the most vulnerable states, yet the Psalm expresses confidence in God's protection. This kind of trust develops over time, as a person learns to rely on God's presence rather than their own control.
+
+Christ's words, "Let not your heart be troubled," are not dismissive of fear, but an invitation to trust in something greater.`,
+      takeaway:"God offers you a peace that circumstances cannot take away.\nYou can rest in Him."
+    },
+    {
+      label:"Mini-Team 3",
+      scriptures:[
+        { ref:"1 Peter 5:7", text:"Casting all your care upon Him, for He cares for you." },
+        { ref:"Psalm 94:18–19", text:"If I say, 'My foot slips,'\nYour mercy, O Lord, will hold me up.\nIn the multitude of my anxieties within me,\nYour comforts delight my soul." }
+      ],
+      commentarySource:"St. Ephrem the Syrian",
+      commentary:`St. Ephrem teaches that anxiety often grows when concerns remain internal and unspoken. The mind begins to carry burdens repeatedly, turning them over without resolution. This leads to exhaustion and inner heaviness.
+
+Scripture offers a different approach: casting our cares upon God. This is not a passive act, but an intentional one. It requires acknowledging what we are carrying and choosing to release it into God's care.
+
+Ephrem emphasizes the reason this is possible: "for He cares for you." This is deeply personal. God's care is not abstract or distant — it is directed toward each individual.
+
+The Psalm reflects the experience of instability — "my foot slips" — yet immediately points to God's mercy as the one who holds us. Even when the mind is filled with many anxieties, God's comfort is able to reach the soul.
+
+This comfort does not necessarily remove all concerns, but it brings relief and assurance within them.`,
+      takeaway:"God cares about what you are carrying.\nYou can release your burdens to Him."
+    },
+    {
+      label:"Mini-Team 4",
+      scriptures:[
+        { ref:"Isaiah 41:10", text:"Fear not, for I am with you;\nBe not dismayed, for I am your God.\nI will strengthen you,\nYes, I will help you,\nI will uphold you with My righteous right hand." },
+        { ref:"Psalm 23:4", text:"Yea, though I walk through the valley of the shadow of death,\nI will fear no evil;\nFor You are with me;\nYour rod and Your staff, they comfort me." }
+      ],
+      commentarySource:"St. Athanasius the Apostolic",
+      commentary:`St. Athanasius teaches that fear is often rooted in a sense of isolation — the feeling that we must face challenges alone. Scripture addresses this directly by emphasizing God's presence: "I am with you."
+
+This presence is not symbolic, but real. God does not promise a life without difficulty, but He promises to be present within it. The image of walking through the "valley of the shadow of death" reflects deep fear and uncertainty, yet the Psalm declares that fear does not have the final say.
+
+Athanasius explains that God's presence transforms the experience of fear. The situation may not immediately change, but the person is no longer alone within it. God strengthens, helps, and upholds.
+
+Comfort, in this context, does not come from the removal of difficulty, but from the assurance of God's nearness.`,
+      takeaway:"You are not alone in what you are facing.\nGod is with you, strengthening and holding you."
+    },
+    {
+      label:"Mini-Team 5",
+      scriptures:[
+        { ref:"Matthew 6:34", text:"Therefore do not worry about tomorrow,\nFor tomorrow will worry about its own things.\nSufficient for the day is its own trouble." },
+        { ref:"Psalm 121:3–4", text:"He will not allow your foot to be moved;\nHe who keeps you will not slumber.\nBehold, He who keeps Israel\nShall neither slumber nor sleep." }
+      ],
+      commentarySource:"St. John Chrysostom",
+      commentary:`St. John Chrysostom teaches that much of human anxiety comes from projecting into the future. People attempt to anticipate, control, and solve problems that have not yet happened. This creates unnecessary burden.
+
+Christ's instruction is simple but profound: focus on today. Each day has its own challenges, and trying to carry the weight of the future only increases anxiety.
+
+The Psalm reinforces God's constant care. Unlike human beings, who grow tired and need rest, God does not sleep. His watchfulness is continuous and unchanging.
+
+Chrysostom explains that this truth allows the believer to release the need to control everything. Trust grows when we recognize that God is attentive, even when we are not.
+
+Living one day at a time is not avoidance, but trust.`,
+      takeaway:"You don't need to carry tomorrow today.\nGod is already watching over you."
+    },
+    {
+      label:"Mini-Team 6",
+      scriptures:[
+        { ref:"John 16:33", text:"In the world you will have tribulation;\nBut be of good cheer, I have overcome the world." },
+        { ref:"Psalm 55:6–8", text:"So I said, 'Oh, that I had wings like a dove!\nI would fly away and be at rest.\nIndeed, I would wander far off,\nAnd remain in the wilderness.'" }
+      ],
+      commentarySource:"St. Isaac the Syrian",
+      commentary:`St. Isaac teaches that the desire to escape difficulty is deeply human. The Psalm expresses this honestly — the longing to run away, to find rest somewhere far from struggle. This desire is not condemned, but acknowledged.
+
+However, Christ's words offer a different path. He does not promise escape from tribulation, but victory within it. "I have overcome the world" means that suffering does not have ultimate authority.
+
+Isaac explains that true peace is not found in avoiding difficulty, but in encountering God within it. Running away may provide temporary relief, but it does not bring lasting peace. Peace comes when the heart learns to remain steady even in hardship.
+
+This steadiness is not self-produced, but rooted in trust in Christ's victory.`,
+      takeaway:"You don't need to escape to find peace.\nPeace is found in Christ, even in difficulty."
+    }
+  ]
+}
 ];
 
-// ══ ROUTING — check URL params ══
+// ════════════════════════════════════════════
+// ROUTING
+// ════════════════════════════════════════════
 const params = new URLSearchParams(window.location.search);
-const groupParam = parseInt(params.get('group'));
+const gParam = parseInt(params.get('group'));
+const mParam = parseInt(params.get('mini'));
 
-if (groupParam >= 1 && groupParam <= 6) {
-  showParticipantView(groupParam);
+if (gParam >= 1 && gParam <= 6 && mParam >= 1 && mParam <= 6) {
+  showContent(gParam, mParam);
+} else if (gParam >= 1 && gParam <= 6) {
+  showParticipant(gParam);
 } else {
-  showAdminView();
+  showAdmin();
 }
 
-// ══ ADMIN VIEW ══
-function showAdminView() {
+// ════════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════════
+function showAdmin() {
   document.getElementById('admin-view').style.display = 'block';
-  document.getElementById('participant-view').style.display = 'none';
-
   const grid = document.getElementById('qr-grid');
-
-  GROUPS.forEach(group => {
-    // Build the URL this QR code should point to
-    const landingUrl = `${window.location.href.split('?')[0]}?group=${group.id}`;
-
+  const base = window.location.href.split('?')[0];
+  GROUPS.forEach(g => {
+    const url = `${base}?group=${g.id}`;
     const card = document.createElement('div');
     card.className = 'qr-card';
     card.innerHTML = `
       <div class="qr-card-header">
-        <div class="group-badge" style="background:${group.color}">${group.id}</div>
+        <div class="group-badge" style="background:${g.color}">${g.id}</div>
         <div>
-          <h2>${group.name}</h2>
-          <small>Place this QR code at Table ${group.id}</small>
+          <h2>${g.name}</h2>
+          <small>${g.topic} · Table ${g.id}</small>
         </div>
       </div>
       <div class="qr-area">
-        <div class="qr-box" id="qr-${group.id}"></div>
-        <div class="mini-links">
-          ${group.miniTeams.map((mt, i) => `
-            <a href="${mt.url}" target="_blank" class="mini-link-btn"
-               style="border-color:${group.color}; color:${group.color}">
-              <span class="mini-dot" style="background:${group.color}"></span>
-              ${mt.label}
-              <span style="margin-left:auto; font-size:0.75rem; opacity:0.6">↗ Open tab</span>
-            </a>
-          `).join('')}
-        </div>
-        <p class="print-instructions">Scan to go to Group ${group.id} landing page</p>
-      </div>
-    `;
+        <div class="qr-box" id="qr-${g.id}"></div>
+        <div class="qr-url">${url}</div>
+      </div>`;
     grid.appendChild(card);
-
-    // Generate QR code
     setTimeout(() => {
-      new QRCode(document.getElementById(`qr-${group.id}`), {
-        text: landingUrl,
-        width: 180,
-        height: 180,
-        colorDark: "#1A1209",
-        colorLight: "#ffffff",
+      new QRCode(document.getElementById(`qr-${g.id}`), {
+        text: url, width:160, height:160,
+        colorDark:"#1A1209", colorLight:"#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
-    }, 100);
+    }, 80);
   });
 }
 
-// ══ PARTICIPANT VIEW ══
-function showParticipantView(groupId) {
-  document.getElementById('admin-view').style.display = 'none';
-  const pv = document.getElementById('participant-view');
-  pv.style.display = 'block';
-
-  const group = GROUPS[groupId - 1];
-
-  // Hero styling
-  const hero = document.getElementById('participant-hero');
-  hero.style.background = `linear-gradient(135deg, ${group.color} 0%, ${darken(group.color, 30)} 100%)`;
-
-  document.getElementById('hero-number').textContent = groupId;
-  document.getElementById('hero-title').textContent = group.name;
-  document.title = `${group.name} — Workshop`;
-
-  // Mini-team cards
-  const container = document.getElementById('mini-group-cards');
-  const letters = ['A', 'B', 'C'];
-
-  group.miniTeams.forEach((mt, i) => {
-    const card = document.createElement('a');
-    card.href = mt.url;
-    card.target = '_blank';
-    card.className = 'mini-card';
-    card.style.borderColor = `${group.color}30`;
-    card.innerHTML = `
-      <div class="mini-card::before" style="background:${group.color}"></div>
-      <div class="mini-card-icon" style="background:${group.color}">${letters[i]}</div>
-      <div class="mini-card-text">
+// ════════════════════════════════════════════
+// PARTICIPANT
+// ════════════════════════════════════════════
+function showParticipant(gId) {
+  document.getElementById('participant-view').style.display = 'block';
+  const g = GROUPS[gId-1];
+  const hero = document.getElementById('p-hero');
+  hero.style.background = `linear-gradient(135deg, ${g.color}, ${darken(g.color,28)})`;
+  document.getElementById('p-num').textContent = gId;
+  document.getElementById('p-title').textContent = g.name + ' · ' + g.topic;
+  document.title = g.name;
+  const base = window.location.href.split('?')[0];
+  const list = document.getElementById('mini-btn-list');
+  const letters = ['1','2','3','4','5','6'];
+  g.miniTeams.forEach((mt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'mini-btn';
+    btn.style.borderColor = g.color + '40';
+    btn.innerHTML = `
+      <div class="mini-btn-icon" style="background:${g.color}">${letters[i]}</div>
+      <div>
         <strong>${mt.label}</strong>
-        <span>Tap to open your document</span>
+        <span>Tap to read your content</span>
       </div>
-      <div class="mini-card-arrow">→</div>
-    `;
-    // Apply left accent bar via JS since ::before can't be set inline
-    card.style.borderLeft = `5px solid ${group.color}`;
-    container.appendChild(card);
+      <div class="mini-btn-arrow">→</div>`;
+    btn.onclick = () => { window.location.href = `${base}?group=${gId}&mini=${i+1}`; };
+    list.appendChild(btn);
   });
 }
 
-function darken(hex, amount) {
-  let r = parseInt(hex.slice(1,3),16);
-  let g = parseInt(hex.slice(3,5),16);
-  let b = parseInt(hex.slice(5,7),16);
-  r = Math.max(0, r - amount);
-  g = Math.max(0, g - amount);
-  b = Math.max(0, b - amount);
-  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+// ════════════════════════════════════════════
+// CONTENT
+// ════════════════════════════════════════════
+function showContent(gId, mId) {
+  document.getElementById('content-view').style.display = 'block';
+  const g = GROUPS[gId-1];
+  const mt = g.miniTeams[mId-1];
+  const hero = document.getElementById('c-hero');
+  hero.style.background = `linear-gradient(135deg, ${g.color}, ${darken(g.color,28)})`;
+  document.getElementById('c-tag').textContent = g.name + ' · ' + g.topic;
+  document.getElementById('c-title').textContent = mt.label;
+  document.title = mt.label + ' — ' + g.name;
+  const base = window.location.href.split('?')[0];
+  document.getElementById('c-back').onclick = () => { window.location.href = `${base}?group=${gId}`; };
+
+  const content = document.getElementById('c-content');
+
+  // Scripture
+  const sBlock = document.createElement('div');
+  sBlock.className = 'section-block';
+  sBlock.innerHTML = `<div class="section-label">📖 Scripture Readings</div>`;
+  mt.scriptures.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'scripture-card';
+    card.style.borderLeftColor = g.color;
+    card.innerHTML = `<div class="scripture-ref">${s.ref}</div><div class="scripture-text">${s.text.replace(/\n/g,'<br>')}</div>`;
+    sBlock.appendChild(card);
+  });
+  content.appendChild(sBlock);
+
+  // Commentary
+  const cBlock = document.createElement('div');
+  cBlock.className = 'section-block';
+  cBlock.innerHTML = `<div class="section-label">🧠 Patristic Commentary</div>`;
+  const cCard = document.createElement('div');
+  cCard.className = 'commentary-card';
+  const paragraphs = mt.commentary.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+  cCard.innerHTML = `<div class="commentary-source">Drawing from ${mt.commentarySource}</div><div class="commentary-text">${paragraphs}</div>`;
+  cBlock.appendChild(cCard);
+  content.appendChild(cBlock);
+
+  // Takeaway
+  const tBlock = document.createElement('div');
+  tBlock.className = 'section-block';
+  tBlock.innerHTML = `<div class="section-label">❤️ Spiritual Takeaway</div>`;
+  const tCard = document.createElement('div');
+  tCard.className = 'takeaway-card';
+  tCard.style.background = g.color;
+  tCard.innerHTML = `<p>${mt.takeaway.replace(/\n/g,'<br>')}</p>`;
+  tBlock.appendChild(tCard);
+  content.appendChild(tBlock);
+}
+
+function darken(hex, amt) {
+  let r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `#${Math.max(0,r-amt).toString(16).padStart(2,'0')}${Math.max(0,g-amt).toString(16).padStart(2,'0')}${Math.max(0,b-amt).toString(16).padStart(2,'0')}`;
 }
 </script>
 </body>
