@@ -95,6 +95,16 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--cre
 </head>
 <body>
 
+<div id="admin-view">
+  <div class="admin-header">
+    <h1>Workshop QR Codes</h1>
+    <div class="divider"></div>
+    <p>Print and place one card at each table. Participants scan → choose their mini-team → read their content.</p>
+  </div>
+  <div class="qr-grid" id="qr-grid"></div>
+  <button class="print-btn" onclick="window.print()">🖨 Print All QR Cards</button>
+</div>
+
 <div id="participant-view">
   <div class="p-hero" id="p-hero">
     <div class="p-hero-bg"></div>
@@ -753,17 +763,19 @@ This steadiness is not self-produced, but rooted in trust in Christ's victory.`,
 // ════════════════════════════════════════════
 // ROUTING
 // ════════════════════════════════════════════
-const params = new URLSearchParams(window.location.search);
-const gParam = parseInt(params.get('group'));
-const mParam = parseInt(params.get('mini'));
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const gParam = parseInt(params.get('group'));
+  const mParam = parseInt(params.get('mini'));
 
-if (gParam >= 1 && gParam <= 6 && mParam >= 1 && mParam <= 6) {
-  showContent(gParam, mParam);
-} else if (gParam >= 1 && gParam <= 6) {
-  showParticipant(gParam);
-} else {
-  showAdmin();
-}
+  if (gParam >= 1 && gParam <= 6 && mParam >= 1 && mParam <= 6) {
+    showContent(gParam, mParam);
+  } else if (gParam >= 1 && gParam <= 6) {
+    showParticipant(gParam);
+  } else {
+    showAdmin();
+  }
+});
 
 // ════════════════════════════════════════════
 // ADMIN
